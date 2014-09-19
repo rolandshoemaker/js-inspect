@@ -19,13 +19,15 @@ f = open(args.file, "r")
 data = f.read()
 f.close()
 
-var_funcs = re.findall(r"var (.+) = function\((.+|, .+|,.+|)\)|function (.+)\((.+|, .+|,.+|)\)|\s+(.+): function\((.+|, .+|,.+|)\)", data)
+var_funcs = re.findall(r"var (.+) = function\((.+|, .+|,.+|)\)|function (.+)\((.+|, .+|,.+|)\)|\s+(.+): function\((.+|, .+|,.+|)\)|^(?!//)\s+var (.+) = (?!function)", data, re.MULTILINE)
 
 print(colors.HEADER+"js-inspect.py - "+args.file+colors.ENDC)
 print(colors.FAIL+"[functions]"+colors.ENDC)
 for i in var_funcs:
-	for y in [0,2,4]:
-		if not i[y+1] == "":
+	for y in [0,2,4,6]:
+		if not y == 6 and not i[y+1] == "":
 			print("\t"+colors.WARNING+i[y]+colors.ENDC+"("+colors.OKBLUE+i[y+1]+colors.ENDC+")")
-		elif not i[y] == "":
+		elif not i[y] == "" and not y == 6:
 			print("\t"+colors.WARNING+i[y]+colors.ENDC+"()")
+		elif y == 6 and not i[y] == "":
+			print(colors.OKGREEN+"\tvar "+i[y]+colors.ENDC)
